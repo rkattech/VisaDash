@@ -121,106 +121,46 @@ def render_floating_chatbot():
             }
         ]
     
-    # Add CSS for floating chat bubble
+    # Add CSS for floating chat button styling
+    
+    # Position the actual button at the bottom right
     st.markdown("""
     <style>
-    .floating-chat-bubble {
+    .floating-button-container {
         position: fixed;
         bottom: 30px;
         right: 30px;
-        width: 60px;
-        height: 60px;
-        background: linear-gradient(135deg, #003087, #0066CC);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 20px rgba(0, 48, 135, 0.3);
-        z-index: 1000;
-        cursor: pointer;
-        transition: all 0.3s ease;
+        z-index: 1002;
     }
     
-    .floating-chat-bubble:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 25px rgba(0, 48, 135, 0.4);
+    div[data-testid="stButton"] > button[kind="primary"] {
+        position: fixed !important;
+        bottom: 30px !important;
+        right: 30px !important;
+        width: 60px !important;
+        height: 60px !important;
+        border-radius: 50% !important;
+        background: linear-gradient(135deg, #003087, #0066CC) !important;
+        border: none !important;
+        font-size: 24px !important;
+        z-index: 1003 !important;
+        box-shadow: 0 4px 20px rgba(0, 48, 135, 0.3) !important;
+        transition: all 0.3s ease !important;
     }
     
-    .chat-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1001;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .chat-window {
-        width: 500px;
-        height: 600px;
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-    
-    .chat-window-header {
-        background: linear-gradient(135deg, #003087, #0066CC);
-        color: white;
-        padding: 20px;
-        font-weight: bold;
-        font-size: 18px;
-    }
-    
-    .chat-messages-area {
-        flex: 1;
-        padding: 20px;
-        overflow-y: auto;
-        background: #f8f9fa;
-    }
-    
-    .message {
-        margin-bottom: 15px;
-        padding: 12px 16px;
-        border-radius: 18px;
-        max-width: 80%;
-        word-wrap: break-word;
-    }
-    
-    .user-message {
-        background: #003087;
-        color: white;
-        margin-left: auto;
-        border-bottom-right-radius: 5px;
-    }
-    
-    .assistant-message {
-        background: white;
-        color: #333;
-        border: 1px solid #e0e0e0;
-        border-bottom-left-radius: 5px;
-        white-space: pre-line;
+    div[data-testid="stButton"] > button[kind="primary"]:hover {
+        transform: scale(1.1) !important;
+        box-shadow: 0 6px 25px rgba(0, 48, 135, 0.4) !important;
     }
     </style>
     """, unsafe_allow_html=True)
     
-    # Render floating chat bubble button using HTML
-    st.markdown("""
-    <div class="floating-chat-bubble" onclick="document.getElementById('chat_bubble_btn').click()">
-        💬
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Hidden button that gets triggered by the HTML bubble
-    if st.button("", key="chat_bubble_btn", help="Toggle Chat"):
-        st.session_state.show_chat_window = not st.session_state.show_chat_window
-        st.rerun()
+    # Create invisible columns to position the button
+    col1, col2 = st.columns([20, 1])
+    with col2:
+        if st.button("💬", key="floating_chat_btn", type="primary", help="Open AI Assistant"):
+            st.session_state.show_chat_window = not st.session_state.show_chat_window
+            st.rerun()
     
     # Chat window modal overlay
     if st.session_state.show_chat_window:
