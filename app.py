@@ -26,6 +26,22 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Hide Streamlit's default navigation
+hide_streamlit_style = """
+<style>
+/* Hide Streamlit's auto-generated page navigation */
+section[data-testid="stSidebar"] > div:first-child > div:first-child {display: none}
+section[data-testid="stSidebar"] .css-ng1t4o {display: none}
+section[data-testid="stSidebar"] .css-1d391kg {display: none}
+section[data-testid="stSidebar"] nav[aria-label="Page navigation"] {display: none}
+section[data-testid="stSidebar"] div[role="navigation"] {display: none}
+ul[role="tablist"] {display: none}
+div[data-testid="stSidebarNav"] {display: none}
+nav[data-testid="stSidebarNav"] {display: none}
+</style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 # Custom CSS for Visa branding and filters overlay
 st.markdown(f"""
 <style>
@@ -132,10 +148,11 @@ def main():
     current_index = page_names.index(st.session_state.selected_page) if st.session_state.selected_page in page_names else 0
     
     selected_page = st.sidebar.radio(
-        "",
+        "Views",
         page_names,
         index=current_index,
-        key="navigation_radio"
+        key="navigation_radio",
+        label_visibility="hidden"
     )
     
     # Update session state if selection changed
