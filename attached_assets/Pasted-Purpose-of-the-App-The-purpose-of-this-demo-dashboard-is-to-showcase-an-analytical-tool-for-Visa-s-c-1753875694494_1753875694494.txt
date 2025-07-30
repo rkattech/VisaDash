@@ -1,0 +1,83 @@
+Purpose of the App
+The purpose of this demo dashboard is to showcase an analytical tool for Visa's cross-border business unit leadership. It will enable tracking progress toward a 10% CAGR in cross-border revenues (from $12.7 billion in FY2024 to approximately $22.5 billion by 2030) and identify growth opportunities. The demo will simulate real-time data visualization using mock or historical data, demonstrating interactivity, insights, and decision-support features.
+Scope
+	• In Scope: Implementation of all views described in the dashboard overview (Executive Summary, Performance Tracking, Opportunity Identification, Risk and Compliance, Forecasting). Include basic interactivity (filters, drill-downs, tooltips), mock data for FY2024-Q4 FY2025, and export options (e.g., PDF/CSV).
+	• Out of Scope: Integration with live Visa data sources, advanced AI/ML forecasting models, mobile responsiveness, or production-level security. This is a proof-of-concept demo.
+Functional Requirements
+The dashboard must support the following features, organized by section. Each view should include filters for time period (e.g., quarterly, YTD), segment (consumer, B2B, remittances), geography, and product (e.g., Visa Direct, B2B Connect).
+1. Executive Summary View
+	• REQ-EXEC-01: Display a high-level scorecard with KPIs. 
+		○ Visuals: Gauges/traffic lights for progress (green/yellow/red based on thresholds, e.g., green if >10% CAGR).
+		○ Metrics: Current revenue ($3.5B for Q3 FY2025), achieved CAGR (9.5%), volume growth (13% YoY), revenue yield (0.12%), market share (22%).
+		○ Interactivity: Hover for definitions; click to drill into detailed views.
+	• REQ-EXEC-02: Include a line chart showing actual vs. target revenue trajectory to 2030. 
+		○ Data Points: Historical quarters (FY2024-Q4 FY2025), projected line based on current trends.
+		○ Alerts: Automated notifications (e.g., pop-up if volume growth <12%).
+2. Performance Tracking Views
+	• REQ-PERF-01: Revenue and Volume Trends 
+		○ Visuals: Stacked area/line chart with dual axes (revenue in $B, volume in % growth).
+		○ Metrics: Revenue ($13.5B YTD), volume (12.8% growth in Q3 FY2025), segmented by type (travel: 15%, e-commerce: 10%, B2B: 8%).
+		○ Interactivity: Time slider, segment filters; tooltip with YoY change.
+	• REQ-PERF-02: Geographic Breakdown 
+		○ Visuals: Interactive world heatmap (color-coded by growth rate) and bar chart for top 10 corridors.
+		○ Metrics: Revenue/volume by region (Asia-Pacific: 25% share, 18% growth); penetration (e.g., 30% in India).
+		○ Interactivity: Click on region to zoom/filter; export map as image.
+	• REQ-PERF-03: Product and Segment Performance 
+		○ Visuals: Donut charts for revenue share; trend lines for growth.
+		○ Metrics: Visa Direct (2.5B transactions, 20% growth); B2B Connect ($500B processed, 25% YoY); use-case specifics (remittances speed: 80% <1 hour).
+		○ Interactivity: Product selector; comparative view vs. benchmarks.
+	• REQ-PERF-04: KPI Table 
+		○ Visuals: Tabular view with columns for KPI, Target, Current, YoY Change, Source.
+		○ Example Rows: Volume Growth (12-15%, 13%, +1%, Internal); Revenue Per Transaction ($0.50+, $0.45, +5%, Industry Avg.).
+		○ Interactivity: Sortable, searchable; conditional formatting (e.g., red if below target).
+3. Opportunity Identification Views
+	• REQ-OPP-01: Market Opportunity Heatmap 
+		○ Visuals: Bubble chart (x-axis: potential revenue, y-axis: current penetration, bubble size: market size).
+		○ Metrics: Untapped corridors ($50B in Asia-Africa remittances, 10% Visa share); trends (CBDC adoption: 15%).
+		○ Interactivity: Filter by segment; tooltip with opportunity details.
+	• REQ-OPP-02: Competitive and Trend Analysis 
+		○ Visuals: Radar chart comparing Visa to peers (e.g., Mastercard, Swift); word cloud for emerging trends.
+		○ Metrics: Market share (Visa 25%); trend scores (stablecoin growth: 30% YoY).
+		○ Interactivity: Competitor selector; link to external reports (mock URLs).
+	• REQ-OPP-03: Partnership and Pipeline 
+		○ Visuals: Funnel chart for deal stages (awareness, negotiation, closed); table of partnerships.
+		○ Metrics: New partnerships (8 in Q3); pipeline value ($2B potential).
+		○ Interactivity: Stage filters; drill-down to partner details.
+4. Risk and Compliance Views
+	• REQ-RISK-01: Risk Dashboard 
+		○ Visuals: Gauge charts for risk levels; heatmap for incident types.
+		○ Metrics: Fraud rate (<0.5%); chargeback ratio (1%); compliance score (95%); FSB KPIs (transaction cost <1%).
+		○ Interactivity: Time-based filters; alert icons for high risks.
+5. Forecasting and Scenario Views
+	• REQ-FORE-01: Forecast Model 
+		○ Visuals: Line chart with confidence bands; sliders for scenarios.
+		○ Metrics: Projected revenue ($20B at 9% CAGR, $23B at 11%); sensitivity (e.g., +5% if travel up).
+		○ Interactivity: Adjust variables (e.g., growth rate, volatility); re-run forecast on-the-fly.
+General Functional Requirements
+	• REQ-GEN-01: Global Filters: Apply across all views (e.g., date range, segments).
+	• REQ-GEN-02: Export and Sharing: Buttons for PDF/CSV export, shareable links.
+	• REQ-GEN-03: Tooltips and Help: Contextual help icons explaining metrics.
+	• REQ-GEN-04: User Authentication: Simple mock login for demo (e.g., role-based views).
+Non-Functional Requirements
+	• Performance: Load time <5 seconds; handle up to 1,000 data points without lag.
+	• Usability: Intuitive navigation (sidebar menu for sections); responsive design for desktop (min. 1024x768 resolution).
+	• Accessibility: WCAG 2.1 compliance (e.g., alt text for visuals, keyboard navigation).
+	• Security: Mock data only; no real sensitive info. In demo, use encrypted connections if web-based.
+	• Scalability: Designed for future live data integration (e.g., API endpoints).
+	• Reliability: Error handling for data gaps (e.g., "No data available" messages).
+	• Compatibility: Works on Chrome, Edge; BI tool version (e.g., Tableau 2023+).
+Data Requirements
+Data Sources for Demo
+	• Use mock datasets generated from historical Visa reports and expectations (e.g., Q3 FY2025 cross-border volume growth ~12.8%).
+	• Mock Data Generation: Create CSV/JSON files with: 
+		○ Time-series data: Quarterly revenue/volume from FY2024-Q4 FY2025.
+		○ Segment breakdowns: Randomly generated within realistic ranges (e.g., travel volume: 10-20% growth).
+		○ External benchmarks: Hard-coded from sources like FSB reports ($290T global flows by 2030).
+	• Schema Example: 
+		○ Table: Revenue_Trends (columns: Quarter, Revenue_B, Volume_Growth_Pct, Segment, Region).
+		○ Table: KPIs (columns: Metric_Name, Target, Current_Value, YoY_Change).
+		○ Total Records: 500-1,000 for demo performance.
+	• Data Refresh: Static for demo; simulate real-time with a "Refresh" button reloading mock data.
+UI Design Specifications
+	• Layout: Single-page app with top navigation bar (sections as tabs), left sidebar for filters, main content area for visuals.
+Color Scheme: Visa branding (blue #003087, green for positive growth, red for risks).
