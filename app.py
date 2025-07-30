@@ -26,12 +26,12 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for Visa branding
+# Custom CSS for Visa branding and filters overlay
 st.markdown(f"""
 <style>
     .main-header {{
         color: {VISA_BLUE};
-        text-align: center;
+        text-align: left;
         padding: 1rem 0;
         border-bottom: 3px solid {VISA_BLUE};
         margin-bottom: 2rem;
@@ -45,6 +45,49 @@ st.markdown(f"""
     .metric-neutral {{
         color: {VISA_BLUE};
     }}
+    
+    /* Navigation radio buttons styling */
+    .stRadio > div[role="radiogroup"] > label {{
+        background: transparent;
+        padding: 0.5rem 1rem;
+        margin: 0.25rem 0;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+    }}
+    .stRadio > div[role="radiogroup"] > label:hover {{
+        background-color: {VISA_BLUE};
+        color: white;
+        border-color: {VISA_BLUE};
+    }}
+    .stRadio > div[role="radiogroup"] > label[data-checked="true"] {{
+        background-color: {VISA_BLUE};
+        color: white;
+        border-color: {VISA_BLUE};
+        font-weight: bold;
+    }}
+    .stRadio > div[role="radiogroup"] > label > div {{
+        display: flex;
+        align-items: center;
+    }}
+    .stRadio > div[role="radiogroup"] > label > div > div:first-child {{
+        margin-right: 0.5rem;
+    }}
+    
+    /* Filters toggle button styling */
+    div[data-testid="column"]:nth-child(2) .stButton > button {{
+        background-color: {VISA_BLUE};
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        font-weight: bold;
+        transition: all 0.2s ease;
+    }}
+    div[data-testid="column"]:nth-child(2) .stButton > button:hover {{
+        background-color: {VISA_GREEN};
+        color: white;
+    }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -57,8 +100,17 @@ def main():
     if 'global_filters' not in st.session_state:
         st.session_state.global_filters = GlobalFilters()
     
-    # Main header
-    st.markdown('<h1 class="main-header">Visa Cross-Border Analytics Dashboard</h1>', unsafe_allow_html=True)
+    # Main header with filters toggle
+    header_col1, header_col2 = st.columns([5, 1])
+    with header_col1:
+        st.markdown('<h1 class="main-header">Visa Cross-Border Analytics Dashboard</h1>', unsafe_allow_html=True)
+    with header_col2:
+        # Initialize filters visibility state
+        if 'show_filters' not in st.session_state:
+            st.session_state.show_filters = False
+        
+        if st.button("🔍 Filters", key="filters_toggle", help="Show/Hide Filters"):
+            st.session_state.show_filters = not st.session_state.show_filters
     
     # Sidebar navigation
     st.sidebar.title("Navigation")
@@ -71,22 +123,45 @@ def main():
         "🔮 Forecasting": "forecasting"
     }
     
-    selected_page = st.sidebar.selectbox("Select View", list(pages.keys()))
+    # Initialize selected page in session state
+    if 'selected_page' not in st.session_state:
+        st.session_state.selected_page = "📊 Executive Summary"
     
-    # Global filters in sidebar
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("### Global Filters")
+    # Create navigation menu as radio buttons for better UX
+    page_names = list(pages.keys())
+    current_index = page_names.index(st.session_state.selected_page) if st.session_state.selected_page in page_names else 0
     
-    # Apply global filters
-    filters = st.session_state.global_filters.render_filters()
+    selected_page = st.sidebar.radio(
+        "",
+        page_names,
+        index=current_index,
+        key="navigation_radio"
+    )
+    
+    # Update session state if selection changed
+    if selected_page != st.session_state.selected_page:
+        st.session_state.selected_page = selected_page
+    
+    # Filters panel (conditionally shown)
+    if st.session_state.show_filters:
+        with st.expander("🔍 Dashboard Filters", expanded=True):
+            filters = st.session_state.global_filters.render_filters()
+    else:
+        # Use default filters when panel is hidden
+        filters = {
+            'segments': ['Travel', 'E-commerce', 'B2B', 'Remittances'],
+            'regions': ['North America', 'Europe', 'Asia-Pacific', 'Latin America', 'Middle East & Africa'],
+            'products': ['Visa Direct', 'B2B Connect', 'Traditional Cards', 'Other Services'],
+            'currency': 'USD'
+        }
     
     # Data refresh button
+    st.sidebar.markdown("---")
     if st.sidebar.button("🔄 Refresh Data"):
         st.session_state.data_generator = DataGenerator()
         st.rerun()
     
     # Export options
-    st.sidebar.markdown("---")
     st.sidebar.markdown("### Export Options")
     
     if st.sidebar.button("📄 Export PDF"):
