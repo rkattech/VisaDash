@@ -107,106 +107,178 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
-def render_chatbot_overlay():
-    """Render the AI Assistant chatbot overlay"""
-    # Initialize chat history
+def render_floating_chatbot():
+    """Render floating chat bubble and chat window using Streamlit components"""
+    # Initialize chatbot states
+    if 'show_chat_window' not in st.session_state:
+        st.session_state.show_chat_window = False
+    
     if 'chat_messages' not in st.session_state:
         st.session_state.chat_messages = [
             {
                 "role": "assistant", 
-                "content": """👋 **Hello! I'm your Visa Analytics AI Assistant**
-
-I'm here to help you navigate and understand this cross-border business analytics dashboard. Here's what I can assist you with:
-
-🔍 **Data Insights**: I can explain the source of any data, methodology behind calculations, and provide context for metrics and trends.
-
-🛠️ **Technical Support**: Need to report a bug or provide feedback to the development team? I can help document and route your feedback.
-
-📊 **Custom Exports**: Want specific views, filtered data, or custom reports? I can help create tailored exports based on your needs.
-
-❓ **Dashboard Navigation**: I can guide you through different sections, explain visualizations, and help you find specific information.
-
-📈 **Business Analysis**: Ask me about trends, performance insights, forecasting scenarios, or competitive analysis.
-
-💡 **Feature Requests**: Have ideas for dashboard improvements? I can collect your suggestions and communicate them to the development team.
-
-Feel free to ask me anything about the dashboard, the data, or how to get the most value from these analytics!"""
+                "content": "Hello! I'm your Visa Analytics AI Assistant.\n\nI'm here to help you navigate and understand this cross-border business analytics dashboard. Here's what I can assist you with:\n\n• **Data Insights**: I can explain the source of any data, methodology behind calculations, and provide context for metrics and trends.\n\n• **Technical Support**: Need to report a bug or provide feedback to the development team? I can help document and route your feedback.\n\n• **Custom Exports**: Want specific views, filtered data, or custom reports? I can help create tailored exports based on your needs.\n\n• **Dashboard Navigation**: I can guide you through different sections, explain visualizations, and help you find specific information.\n\n• **Business Analysis**: Ask me about trends, performance insights, forecasting scenarios, or competitive analysis.\n\n• **Feature Requests**: Have ideas for dashboard improvements? I can collect your suggestions and communicate them to the development team.\n\nFeel free to ask me anything about the dashboard, the data, or how to get the most value from these analytics!"
             }
         ]
     
-    # Chatbot overlay container
-    with st.container():
-        st.markdown("""
-        <style>
-        .chatbot-overlay {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 400px;
-            height: 100vh;
-            background: white;
-            box-shadow: -5px 0 15px rgba(0,0,0,0.2);
-            z-index: 1003;
-            padding: 20px;
-            overflow-y: auto;
-            border-left: 3px solid #003087;
-        }
-        .chat-message {
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 10px;
-        }
-        .user-message {
-            background: #f0f2f6;
-            margin-left: 20px;
-        }
-        .assistant-message {
-            background: #e3f2fd;
-            margin-right: 20px;
-        }
-        .chat-header {
-            color: #003087;
-            border-bottom: 2px solid #003087;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-        
-        # Chat header with close button
-        col1, col2 = st.columns([4, 1])
-        with col1:
-            st.markdown('<h3 class="chat-header">💬 AI Assistant</h3>', unsafe_allow_html=True)
-        with col2:
-            if st.button("✕", key="close_chatbot", help="Close AI Assistant"):
-                st.session_state.show_chatbot = False
-                st.rerun()
-        
-        # Display chat messages
-        chat_container = st.container()
-        with chat_container:
-            for message in st.session_state.chat_messages:
-                if message["role"] == "user":
-                    st.markdown(f'<div class="chat-message user-message">👤 {message["content"]}</div>', unsafe_allow_html=True)
-                else:
-                    st.markdown(f'<div class="chat-message assistant-message">🤖 {message["content"]}</div>', unsafe_allow_html=True)
-        
-        # Chat input
-        st.markdown("---")
-        user_input = st.text_area("Ask me anything about the dashboard:", key="chat_input", height=100, placeholder="e.g., What's the source of the revenue data? Can you create a custom export for Q3 metrics?")
-        
-        col1, col2 = st.columns([3, 1])
-        with col2:
-            if st.button("Send", key="send_message", type="primary"):
-                if user_input.strip():
-                    # Add user message
-                    st.session_state.chat_messages.append({"role": "user", "content": user_input})
-                    
-                    # Generate AI response
-                    ai_response = generate_ai_response(user_input)
-                    st.session_state.chat_messages.append({"role": "assistant", "content": ai_response})
-                    
+    # Add CSS for floating chat bubble
+    st.markdown("""
+    <style>
+    .floating-chat-bubble {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #003087, #0066CC);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 20px rgba(0, 48, 135, 0.3);
+        z-index: 1000;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .floating-chat-bubble:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 25px rgba(0, 48, 135, 0.4);
+    }
+    
+    .chat-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .chat-window {
+        width: 500px;
+        height: 600px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    
+    .chat-window-header {
+        background: linear-gradient(135deg, #003087, #0066CC);
+        color: white;
+        padding: 20px;
+        font-weight: bold;
+        font-size: 18px;
+    }
+    
+    .chat-messages-area {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background: #f8f9fa;
+    }
+    
+    .message {
+        margin-bottom: 15px;
+        padding: 12px 16px;
+        border-radius: 18px;
+        max-width: 80%;
+        word-wrap: break-word;
+    }
+    
+    .user-message {
+        background: #003087;
+        color: white;
+        margin-left: auto;
+        border-bottom-right-radius: 5px;
+    }
+    
+    .assistant-message {
+        background: white;
+        color: #333;
+        border: 1px solid #e0e0e0;
+        border-bottom-left-radius: 5px;
+        white-space: pre-line;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Render floating chat bubble button using HTML
+    st.markdown("""
+    <div class="floating-chat-bubble" onclick="document.getElementById('chat_bubble_btn').click()">
+        💬
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Hidden button that gets triggered by the HTML bubble
+    if st.button("", key="chat_bubble_btn", help="Toggle Chat"):
+        st.session_state.show_chat_window = not st.session_state.show_chat_window
+        st.rerun()
+    
+    # Chat window modal overlay
+    if st.session_state.show_chat_window:
+        # Create modal-like overlay
+        with st.container():
+            # Header
+            col1, col2 = st.columns([6, 1])
+            with col1:
+                st.markdown("### 💬 AI Assistant")
+            with col2:
+                if st.button("✕", key="close_chat_window"):
+                    st.session_state.show_chat_window = False
                     st.rerun()
+            
+            st.markdown("---")
+            
+            # Messages display area with custom styling
+            with st.container():
+                st.markdown('<div style="height: 400px; overflow-y: auto; padding: 10px; background: #f8f9fa; border-radius: 10px; margin-bottom: 20px;">', unsafe_allow_html=True)
+                
+                for message in st.session_state.chat_messages:
+                    if message["role"] == "user":
+                        st.markdown(f"""
+                        <div style="text-align: right; margin: 10px 0;">
+                            <div style="display: inline-block; background: #003087; color: white; padding: 10px 15px; border-radius: 15px 15px 5px 15px; max-width: 70%;">
+                                {message["content"]}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        st.markdown(f"""
+                        <div style="text-align: left; margin: 10px 0;">
+                            <div style="display: inline-block; background: white; color: #333; padding: 10px 15px; border-radius: 15px 15px 15px 5px; border: 1px solid #e0e0e0; max-width: 70%; white-space: pre-line;">
+                                {message["content"]}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                
+                st.markdown('</div>', unsafe_allow_html=True)
+            
+            # Chat input area
+            user_input = st.text_area("Ask me anything about the dashboard:", 
+                                    key="chat_input", 
+                                    height=100,
+                                    placeholder="e.g., What's the source of the revenue data? Can you create a custom export for Q3 metrics?")
+            
+            col1, col2 = st.columns([4, 1])
+            with col2:
+                if st.button("Send", key="send_message", type="primary"):
+                    if user_input.strip():
+                        # Add user message
+                        st.session_state.chat_messages.append({"role": "user", "content": user_input})
+                        
+                        # Generate AI response
+                        ai_response = generate_ai_response(user_input)
+                        st.session_state.chat_messages.append({"role": "assistant", "content": ai_response})
+                        
+                        st.rerun()
 
 def generate_ai_response(user_input):
     """Generate AI response based on user input"""
@@ -366,8 +438,8 @@ def main():
     if 'global_filters' not in st.session_state:
         st.session_state.global_filters = GlobalFilters()
     
-    # Main header with filters toggle and chatbot
-    header_col1, header_col2, header_col3 = st.columns([4, 1, 1])
+    # Main header with filters toggle
+    header_col1, header_col2 = st.columns([5, 1])
     with header_col1:
         st.markdown('<h1 class="main-header">Visa Cross-Border Analytics Dashboard</h1>', unsafe_allow_html=True)
     with header_col2:
@@ -377,14 +449,6 @@ def main():
         
         if st.button("🔍 Filters", key="filters_toggle", help="Show/Hide Filters"):
             st.session_state.show_filters = not st.session_state.show_filters
-    
-    with header_col3:
-        # Initialize chatbot visibility state
-        if 'show_chatbot' not in st.session_state:
-            st.session_state.show_chatbot = False
-        
-        if st.button("💬 AI Assistant", key="chatbot_toggle", help="Open AI Assistant"):
-            st.session_state.show_chatbot = not st.session_state.show_chatbot
     
     # Sidebar navigation
     st.sidebar.title("Navigation")
@@ -417,9 +481,8 @@ def main():
     if selected_page != st.session_state.selected_page:
         st.session_state.selected_page = selected_page
     
-    # AI Chatbot overlay (conditionally shown)
-    if st.session_state.show_chatbot:
-        render_chatbot_overlay()
+    # Render floating chatbot
+    render_floating_chatbot()
     
     # Filters panel (conditionally shown)
     if st.session_state.show_filters:
