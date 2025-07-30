@@ -65,23 +65,7 @@ def render(data_generator, filters):
             for _, row in growth_opps.iterrows():
                 st.write(f"• {row['corridor']}: {row['growth_potential']:.1f}% growth potential, {row['visa_share']:.1f}% current share")
         
-        # Market trends
-        st.subheader("Emerging Market Trends")
-        
-        trends_data = {
-            'Trend': ['Digital Remittances', 'CBDC Adoption', 'B2B Digitization', 'Cross-border E-commerce', 'Crypto Integration'],
-            'Growth Rate': [45, 15, 30, 25, 80],
-            'Market Size ($B)': [25, 50, 100, 75, 10],
-            'Visa Opportunity': ['High', 'Medium', 'High', 'High', 'Low']
-        }
-        
-        fig = px.scatter(trends_data, x='Market Size ($B)', y='Growth Rate',
-                        size=[5]*len(trends_data['Trend']), 
-                        hover_name='Trend',
-                        color='Visa Opportunity',
-                        color_discrete_map={'High': 'green', 'Medium': 'yellow', 'Low': 'red'},
-                        title="Emerging Trends Analysis")
-        st.plotly_chart(fig, use_container_width=True)
+
     
     with tab2:
         st.subheader("Competitive Analysis")
