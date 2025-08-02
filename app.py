@@ -33,20 +33,75 @@ def add_google_analytics():
     """Add Google Analytics 4 tracking code to the page"""
     ga4_measurement_id = os.environ.get("GA4_MEASUREMENT_ID")
     if ga4_measurement_id:
-        ga4_code = f"""
-        <!-- Google tag (gtag.js) -->
+        # Method 1: Inject via st.markdown with unsafe_allow_html
+        ga4_script = f"""
         <script async src="https://www.googletagmanager.com/gtag/js?id={ga4_measurement_id}"></script>
         <script>
           window.dataLayer = window.dataLayer || [];
           function gtag(){{dataLayer.push(arguments);}}
           gtag('js', new Date());
-          gtag('config', '{ga4_measurement_id}');
+          gtag('config', '{ga4_measurement_id}', {{
+            'send_page_view': true,
+            'allow_custom_scripts': true,
+            'cookie_domain': 'auto'
+          }});
+          
+          // Debug message to console
+          console.log('GA4 tracking initialized for domain:', window.location.hostname);
+          console.log('GA4 Measurement ID:', '{ga4_measurement_id}');
+          
+          // Track initial page view
+          gtag('event', 'page_view', {{
+            'page_title': 'Visa Cross-Border Analytics Dashboard',
+            'page_location': window.location.href,
+            'send_to': '{ga4_measurement_id}',
+            'domain': window.location.hostname
+          }});
         </script>
         """
-        components.html(ga4_code, height=0)
+        st.markdown(ga4_script, unsafe_allow_html=True)
+        
+        # Method 2: Also try components method as backup
+        try:
+            components.html(f"""
+            <script>
+              // Additional GA4 tracking for custom domains
+              if (typeof gtag !== 'undefined') {{
+                gtag('config', '{ga4_measurement_id}', {{
+                  'page_title': 'Visa Cross-Border Analytics Dashboard',
+                  'page_location': window.location.href,
+                  'custom_map': {{'domain': window.location.hostname}}
+                }});
+              }}
+            </script>
+            """, height=0)
+        except:
+            pass
 
 # Initialize Google Analytics tracking
 add_google_analytics()
+
+# Function to track page navigation events
+def track_page_view(page_name):
+    """Track page navigation in Google Analytics"""
+    ga4_measurement_id = os.environ.get("GA4_MEASUREMENT_ID")
+    if ga4_measurement_id:
+        tracking_script = f"""
+        <script>
+          if (typeof gtag !== 'undefined') {{
+            gtag('event', 'page_view', {{
+              'page_title': 'Visa Dashboard - {page_name}',
+              'page_location': window.location.href + '#{page_name.lower().replace(" ", "_")}',
+              'send_to': '{ga4_measurement_id}',
+              'custom_parameters': {{
+                'dashboard_section': '{page_name}',
+                'domain': window.location.hostname
+              }}
+            }});
+          }}
+        </script>
+        """
+        components.html(tracking_script, height=0)
 
 # Hide Streamlit's default navigation
 hide_streamlit_style = """
@@ -435,9 +490,12 @@ def main():
         label_visibility="hidden"
     )
     
-    # Update session state if selection changed
+    # Update session state if selection changed and track the page view
     if selected_page != st.session_state.selected_page:
         st.session_state.selected_page = selected_page
+        # Track page view in Google Analytics
+        clean_page_name = selected_page.replace("📊 ", "").replace("📈 ", "").replace("🎯 ", "").replace("⚠️ ", "").replace("🔮 ", "")
+        track_page_view(clean_page_name)
     
     # AI Chatbot overlay (conditionally shown)
     if st.session_state.show_chatbot:
