@@ -1,5 +1,7 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
+import os
 from datetime import datetime, timedelta
 import plotly.express as px
 import plotly.graph_objects as go
@@ -25,6 +27,26 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# Add Google Analytics 4 tracking
+def add_google_analytics():
+    """Add Google Analytics 4 tracking code to the page"""
+    ga4_measurement_id = os.environ.get("GA4_MEASUREMENT_ID")
+    if ga4_measurement_id:
+        ga4_code = f"""
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id={ga4_measurement_id}"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){{dataLayer.push(arguments);}}
+          gtag('js', new Date());
+          gtag('config', '{ga4_measurement_id}');
+        </script>
+        """
+        components.html(ga4_code, height=0)
+
+# Initialize Google Analytics tracking
+add_google_analytics()
 
 # Hide Streamlit's default navigation
 hide_streamlit_style = """
